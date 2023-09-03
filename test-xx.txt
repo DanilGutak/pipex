@@ -1,0 +1,4 @@
+/usr/bin/head, -2, (null), GJS_DEBUG_TOPICS=JS ERROR;JS LOG
+ ya parentkek
+/usr/bin/grep, Now, (null), GJS_DEBUG_TOPICS=JS ERROR;JS LOG
+ ya child
