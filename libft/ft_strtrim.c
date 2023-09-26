@@ -6,7 +6,7 @@
 /*   By: dgutak <dgutak@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 14:48:08 by dgutak            #+#    #+#             */
-/*   Updated: 2023/06/11 12:01:33 by dgutak           ###   ########.fr       */
+/*   Updated: 2023/09/15 15:11:18 by dgutak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@ char	*ft_strtrim(char const *s1, char const *set)
 	char	*res;
 
 	i = 0;
-	while (checkset(*s1, set) == 1)
+	if (checkset(*s1, set) == 1)
 		s1++;
 	j = ft_strlen(s1) - 1;
-	while (j >= 0 && checkset(s1[j], set) == 1)
+	if (j >= 0 && checkset(s1[j], set) == 1)
 		j--;
 	res = malloc(sizeof(char) * (j + 2));
 	if (!res)

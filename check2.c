@@ -1,40 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   check2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dgutak <dgutak@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/04 13:54:28 by dgutak            #+#    #+#             */
-/*   Updated: 2023/09/23 17:05:58 by dgutak           ###   ########.fr       */
+/*   Created: 2023/09/22 11:43:00 by dgutak            #+#    #+#             */
+/*   Updated: 2023/09/22 11:44:05 by dgutak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <stdlib.h>
 
-char	*ft_strjoin(char *s1, char *s2)
+int	charset_check(const char c, char charset)
 {
-	char	*ret;
-	int		len;
-	int		i;
-	char	*temp;
+	if (c == charset)
+		return (1);
+	return (0);
+}
 
-	i = 0;
-	if (!s1)
-		s1 = ft_calloc(1, sizeof(char));
-	temp = s1;
-	if (!s2 || !s1)
-		return (NULL);
-	len = ft_strlen(s1) + ft_strlen(s2);
-	ret = ft_calloc((len + 1), sizeof(char));
-	if (!ret)
-		return (NULL);
-	while (len--)
+int	check_quotes(int in_quotes, char s, int *temp)
+{
+	if ((s == '\"' || s == '\'') && !in_quotes)
 	{
-		if (*temp)
-			ret[i++] = *temp++;
-		else
-			ret[i++] = *s2++;
+		in_quotes = 1;
+		*temp = s;
 	}
-	return (ret);
+	else if (s == *temp)
+		in_quotes = 0;
+	return (in_quotes);
+}
+
+int	freemem(char **result, int i)
+{
+	while (--i >= 0)
+		free(result[i]);
+	free(result);
+	return (-1);
 }

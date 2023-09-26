@@ -6,7 +6,7 @@
 /*   By: dgutak <dgutak@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 17:58:53 by dgutak            #+#    #+#             */
-/*   Updated: 2023/08/05 13:05:36 by dgutak           ###   ########.fr       */
+/*   Updated: 2023/09/26 14:53:05 by dgutak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,34 @@
 # include <stdlib.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <string.h>
 
 typedef struct s_pipex
 {
 	char	**path;
-	char	*pathname;
+	char	*pathname1;
+	char	*pathname2;
 	char	**envp;
-	char	**args;
+	char	**args1;
+	char	**args2;
 	char	*cmd;
+	int		pip[2];
+	int		fd;
+	char	*outfile;
 
 }			t_pipex;
-void		do_child(t_pipex *pipex, char *filed, int *pip);
+void		pipex_pip_freedom(t_pipex *pipex, int *pid);
+void		free_double_p(char **p);
+void		minus_quotes(char **args, t_pipex *pipex);
+void		do_child1(t_pipex *pipex, char *filed, int *pip);
+void		do_child2(t_pipex *pipex, char *filed, int *pip);
+int			freemem(char **result, int i);
+int			check_quotes(int in_quotes, char s, int *temp);
+int			charset_check(const char c, char charset);
 void		do_parent(t_pipex *pipex, char *filed, int *pip);
-void		error(void);
+void		error(t_pipex *pipex, char *str, int status);
 void		execute(char *argv, char **envp);
+char		**split_args(char const *s, char c);
+void		pipex_pip_freedom(t_pipex *pipex, int *pid);
 
 #endif
