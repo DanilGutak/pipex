@@ -6,7 +6,7 @@
 /*   By: dgutak <dgutak@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/05 11:35:39 by dgutak            #+#    #+#             */
-/*   Updated: 2023/09/26 15:13:39 by dgutak           ###   ########.fr       */
+/*   Updated: 2023/09/28 11:41:47 by dgutak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,14 @@
 
 void	error(t_pipex *pipex, char *str, int status)
 {
-	int	fd;
-
 	pipex_pip_freedom(pipex, pipex->pip);
 	if (pipex->fd >= 0)
 		close(pipex->fd);
 	if (pipex->outfile)
 	{
-		fd = open(pipex->outfile, O_TRUNC | O_CREAT | O_RDWR, 0000644);
-		if (fd >= 0)
-			close(fd);
+		pipex->fd = open(pipex->outfile, O_TRUNC | O_CREAT | O_RDWR, 0000644);
+		if (pipex->fd >= 0)
+			close(pipex->fd);
 	}
 	if (status == 0)
 	{
@@ -38,6 +36,8 @@ void	error(t_pipex *pipex, char *str, int status)
 	}
 	else if (status == 2)
 		exit(0);
+	else if (status == 3)
+		exit(1);
 }
 
 void	free_double_p(char **p)
@@ -78,6 +78,10 @@ void	do_child1(t_pipex *pipex, char *filed, int *pip)
 	close(pip[0]);
 	close(pip[1]);
 	close(pipex->fd);
+	free_double_p(pipex->args2);
+	free_double_p(pipex->path);
+	if (pipex->pathname2)
+		free(pipex->pathname2);
 	if (execve(pipex->pathname1, pipex->args1, pipex->envp) == -1)
 		error(pipex, "execve:", 1);
 }
@@ -92,6 +96,10 @@ void	do_child2(t_pipex *pipex, char *filed, int *pip)
 	close(pip[0]);
 	close(pip[1]);
 	close(pipex->fd);
+	free_double_p(pipex->args1);
+	free_double_p(pipex->path);
+	if (pipex->pathname1)
+		free(pipex->pathname1);
 	if (execve(pipex->pathname2, pipex->args2, pipex->envp) == -1)
 		error(pipex, "execve:", 1);
 }

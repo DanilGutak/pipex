@@ -6,7 +6,7 @@
 /*   By: dgutak <dgutak@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/31 17:58:53 by dgutak            #+#    #+#             */
-/*   Updated: 2023/09/26 14:53:05 by dgutak           ###   ########.fr       */
+/*   Updated: 2023/09/28 11:55:13 by dgutak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ typedef struct s_pipex
 	int		pip[2];
 	int		fd;
 	char	*outfile;
+	int		flag1;
+	int		flag2;
 
 }			t_pipex;
 void		pipex_pip_freedom(t_pipex *pipex, int *pid);
@@ -60,5 +62,5 @@ void		error(t_pipex *pipex, char *str, int status);
 void		execute(char *argv, char **envp);
 char		**split_args(char const *s, char c);
 void		pipex_pip_freedom(t_pipex *pipex, int *pid);
-
+void		p_init(t_pipex *pipex, char **argv, int argc);
 #endif

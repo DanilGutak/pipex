@@ -6,7 +6,7 @@
 /*   By: dgutak <dgutak@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 12:03:27 by dgutak            #+#    #+#             */
-/*   Updated: 2023/09/26 15:13:48 by dgutak           ###   ########.fr       */
+/*   Updated: 2023/09/28 11:55:19 by dgutak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	**read_path(char **envp, char *temp, t_pipex *pipex, int i)
 		error(pipex, "pipex: did not find PATH in the enviroment", 0);
 	ret = ft_split(find, ':');
 	if (!ret)
-		error(pipex, "pipex: ft_split failed", 0);	
+		error(pipex, "pipex: ft_split failed", 0);
 	i = -1;
 	while (ret[++i])
 	{
@@ -57,7 +57,6 @@ char	*find_path(t_pipex *pipex)
 		free(ret);
 		i++;
 	}
-	error(pipex, "pipex: command not found", 0);
 	return (NULL);
 }
 
@@ -71,6 +70,8 @@ void	read_cmd(char **argv, int j, t_pipex *pipex)
 		minus_quotes(pipex->args1, pipex);
 		pipex->cmd = pipex->args1[0];
 		pipex->pathname1 = find_path(pipex);
+		if (!pipex->pathname1)
+			pipex->flag1 = 1;
 	}
 	else
 	{
@@ -80,30 +81,40 @@ void	read_cmd(char **argv, int j, t_pipex *pipex)
 		minus_quotes(pipex->args2, pipex);
 		pipex->cmd = pipex->args2[0];
 		pipex->pathname2 = find_path(pipex);
+		if (!pipex->pathname2)
+			pipex->flag2 = 1;
 	}
 }
 
-void	p_init(t_pipex *pipex, char **argv, int argc)
+void	run_children(t_pipex *pipex, char **argv)
 {
-	pipex->path = NULL;
-	pipex->pathname1 = NULL;
-	pipex->pathname2 = NULL;
-	pipex->args1 = NULL;
-	pipex->args2 = NULL;
-	pipex->pip[1] = -1;
-	pipex->pip[0] = -1;
-	pipex->fd = -228;
-	if (argc == 5)
-		pipex->outfile = argv[4];
-	else
-		pipex->outfile = NULL;
+	pid_t	process1;
+	pid_t	process2;
+
+	process1 = fork();
+	if (process1 < 0)
+		error(pipex, "fork: ", 1);
+	if (!process1)
+	{
+		if (pipex->flag1 == 0)
+			do_child1(pipex, argv[1], pipex->pip);
+		error(pipex, "", 3);
+	}
+	waitpid(process1, NULL, 0);
+	process2 = fork();
+	if (process2 < 0)
+		error(pipex, "fork: ", 1);
+	if (!process2)
+	{
+		if (pipex->flag2 == 0)
+			do_child2(pipex, pipex->outfile, pipex->pip);
+		error(pipex, "", 3);
+	}
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_pipex	pipex;
-	pid_t	process1;
-	pid_t	process2;
 
 	p_init(&pipex, argv, argc);
 	if (argc != 5)
@@ -113,16 +124,8 @@ int	main(int argc, char **argv, char **envp)
 		error(&pipex, "pipe:", 1);
 	read_cmd(argv, 2, &pipex);
 	read_cmd(argv, 3, &pipex);
-	process1 = fork();
-	if (process1 < 0)
-		error(&pipex, "fork: ", 1);
-	if (!process1)
-		do_child1(&pipex, argv[1], pipex.pip);
-	waitpid(process1, NULL, 0);
-	process2 = fork();
-	if (process2 < 0)
-		error(&pipex, "fork: ", 1);
-	if (!process2)
-		do_child2(&pipex, pipex.outfile, pipex.pip);
+	run_children(&pipex, argv);
+	if (pipex.flag2 != 0 || pipex.flag1 != 0)
+		error(&pipex, "pipex: command not found", 0);
 	error(&pipex, NULL, 2);
 }
